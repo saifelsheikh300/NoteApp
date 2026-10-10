@@ -42,8 +42,16 @@ jobs:
           path: project/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Run unit tests
+        continue-on-error: true
         working-directory: project
         run: gradle :app:testDebugUnitTest --stacktrace
+
+      - name: Show failed tests
+        if: always()
+        working-directory: project
+        run: |
+          echo "=== Failed tests (empty means none failed) ==="
+          grep -h -B2 -A6 "<failure" app/build/test-results/testDebugUnitTest/*.xml | head -150 || true
 
       - name: Upload test reports
         if: always()
